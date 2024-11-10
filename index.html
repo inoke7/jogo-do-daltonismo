@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Teste de Cores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: #333;
+        }
+        .color-box {
+            width: 80px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .color-box:hover {
+            transform: scale(1.1);
+        }
+        #color-name {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #555;
+        }
+        #timer {
+            font-size: 1em;
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo de Cores</h1>
+    <div id="game-container"></div>
+    <div id="color-name">Clique na cor: <span id="color-target"></span></div>
+    <div id="timer">Tempo: <span id="time-left"></span> segundos</div>
+
+    <script>
+        const colorNames = [
+            "Vermelho", "Azul Escuro", "Verde Claro", "Amarelo", "Laranja",
+            "Rosa Claro", "Marrom Escuro", "Roxo", "Cinza Claro", "Preto",
+            "Ciano", "Verde Musgo", "Azul Claro", "Verde Água", "Rosa",
+            "Turquesa", "Mostarda", "Verde Escuro", "Azul Marinho", "Bege",
+            "Cinza Escuro", "Dourado", "Prata", "Castanho", "Caramelo",
+            "Lavanda", "Coral", "Pêssego", "Verde Limão", "Azeitona"
+        ];
+        
+        const colorValues = [
+            "red", "#00008b", "#90ee90", "yellow", "orange",
+            "#ffb6c1", "#654321", "purple", "#d3d3d3", "black",
+            "#00ffff", "#556b2f", "#add8e6", "#20b2aa", "pink",
+            "#40e0d0", "#ffdb58", "#006400", "#000080", "#f5f5dc",
+            "#a9a9a9", "#ffd700", "#c0c0c0", "#8b4513", "#c68e17",
+            "#e6e6fa", "#ff7f50", "#ffdab9", "#32cd32", "#808000"
+        ];
+
+        let currentPhase = 1;
+        let targetColorName;
+        let timer;
+        const initialTime = 5;
+        let timeLeft;
+
+        function startGame() {
+            currentPhase = 1;
+            loadPhase();
+        }
+
+        function loadPhase() {
+            resetTimer();
+            const gameContainer = document.getElementById("game-container");
+            gameContainer.innerHTML = "";
+
+            // Limita as cores por fase
+            const colorsInPhase = colorValues.slice(0, currentPhase);
+
+            colorsInPhase.forEach(color => {
+                const colorBox = document.createElement("div");
+                colorBox.classList.add("color-box");
+                colorBox.style.backgroundColor = color;
+                colorBox.onclick = () => checkColor(color);
+                gameContainer.appendChild(colorBox);
+            });
+
+            const randomIndex = Math.floor(Math.random() * colorsInPhase.length);
+            targetColorName = colorNames[colorValues.indexOf(colorsInPhase[randomIndex])];
+            document.getElementById("color-target").innerText = targetColorName;
+
+            startTimer();
+        }
+
+        function checkColor(selectedColor) {
+            if (colorNames[colorValues.indexOf(selectedColor)] === targetColorName) {
+                clearInterval(timer);
+                if (currentPhase < 30) {
+                    currentPhase++;
+                    loadPhase();
+                } else {
+                    alert("Parabéns! Você completou todas as fases!");
+                    startGame();
+                }
+            } else {
+                alert("Você errou! O jogo será reiniciado.");
+                startGame();
+            }
+        }
+
+        function startTimer() {
+            timeLeft = initialTime;
+            document.getElementById("time-left").innerText = timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("time-left").innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Tempo esgotado! O jogo será reiniciado.");
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            document.getElementById("time-left").innerText = initialTime;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
